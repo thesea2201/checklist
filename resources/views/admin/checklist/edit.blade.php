@@ -5,7 +5,8 @@
         <div class="fade-in">
             <div class="row justify-content-center">
                 <div class="col-md-12">
-                    <div class="card">
+                    <div id="trigger" class="card-header pointer" data-trigger="edit-fader">{{ __('Edit checklist') }}</div>
+                    <div id="edit-fader" class="card fade-out">
                         @if ($errors->any())
                             <div class="alert alert-danger">
                                 <ul>
@@ -21,7 +22,6 @@
                             @csrf
                             @method('PUT')
 
-                            <div class="card-header">{{ __('Edit checklist') }}</div>
 
                             <div class="card-body">
                                 <div class="row">
@@ -61,6 +61,7 @@
                                 <thead>
                                     <tr>
                                         <th>{{ __('Task name') }}</th>
+                                        <th>{{ __('Description') }}</th>
                                         <th>{{ __('Action') }}</th>
                                     </tr>
                                 </thead>
@@ -68,7 +69,12 @@
                                     @foreach ($checklist->tasks as $task)
                                         <tr>
                                             <td>{{ $task->name }}</td>
-                                            <td>{!! $task->description !!}</td>
+                                            <td style="overflow: hidden;
+                                            text-overflow: ellipsis;
+                                            display: -webkit-box;
+                                            -webkit-line-clamp: 2; /* number of lines to show */
+                                            -webkit-box-orient: vertical;
+                                            max-height: 3.8em;">{!! $task->description !!}</td>
                                             <td>
                                                 <a class="btn btn-sm btn-primary"
                                                     href="{{ route('admin.checklists.tasks.edit', [$checklist, $task]) }}">{{ __('Edit') }}</a>
@@ -138,6 +144,18 @@
             .create(document.querySelector('#task-editor'))
             .catch(error => {
                 console.error(error);
+            });
+
+            $("#trigger").click(function () {
+                let _this = $(this);
+                let fader = _this.data('trigger');
+                if(fader == '') return;
+                fader = $(`#${fader}`);
+                if (fader.hasClass("fade-out")) {
+                    fader.removeClass("fade-out").addClass("fade-in");
+                } else {
+                    fader.removeClass("fade-in").addClass("fade-out");
+                }
             });
     </script>
 

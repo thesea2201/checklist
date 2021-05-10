@@ -16,22 +16,6 @@
         </li>
 
         @if (auth()->user()->is_admin)
-            <li class="c-sidebar-nav-title">Admin</li>
-            <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ route('admin.pages.index') }}">
-                    <svg class="c-sidebar-nav-icon">
-                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
-                    </svg> Pages
-                </a>
-            </li>
-            <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ route('admin.pages.index') }}">
-                    <svg class="c-sidebar-nav-icon">
-                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
-                    </svg> Breadcrumb
-                </a>
-            </li>
-
             <li class="c-sidebar-nav-title">{{ __('Manage Checklists') }}</li>
             {{-- Create checklist group --}}
             <li class="c-sidebar-nav-item">
@@ -68,6 +52,18 @@
                         @endforeach
                     </ul>
                 </li>
+            @endforeach
+
+            <li class="c-sidebar-nav-title">{{ __('Pages') }}</li>
+
+            @foreach (\App\Models\Page::all() as $page)
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ route('admin.pages.edit', [$page]) }}">
+                    <svg class="c-sidebar-nav-icon">
+                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
+                    </svg>{{ $page->title }}
+                </a>
+            </li>
             @endforeach
         @endif
 
