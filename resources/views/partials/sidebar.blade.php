@@ -17,58 +17,84 @@
 
         @if (auth()->user()->is_admin)
             <li class="c-sidebar-nav-title">{{ __('Manage Checklists') }}</li>
-            {{-- Create checklist group --}}
-            <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ route('admin.checklist_groups.create') }}">
-                    <svg class="c-sidebar-nav-icon">
-                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
-                    </svg> {{ __('Create new checklist group') }}
-                </a>
-            </li>
             @foreach (\App\Models\ChecklistGroup::with('checklists')->get() as $group)
                 <li class="c-sidebar-nav-item c-sidebar-nav-dropdown">
                     <a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle"
                         href="{{ route('admin.checklist_groups.edit', $group->id) }}">
                         <svg class="c-sidebar-nav-icon">
-                            <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
+                            <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-folder-open') }}"></use>
                         </svg>{{ $group->name }}
                     </a>
 
                     <ul class="c-sidebar-nav-dropdown-items">
-                        {{-- Create checklist --}}
-                        <li class="c-sidebar-nav-item">
-                            <a class="c-sidebar-nav-link"
-                                href="{{ route('admin.checklist_groups.checklists.create', $group) }}"><span
-                                    class="c-sidebar-nav-icon"></span>{{ __('Create new checklist') }}
-                            </a>
-                        </li>
                         @foreach ($group->checklists as $checklist)
                             <li class="c-sidebar-nav-item">
-                                <a class="c-sidebar-nav-link"
-                                    href="{{ route('admin.checklist_groups.checklists.edit', [$group, $checklist]) }}"><span
-                                        class="c-sidebar-nav-icon"></span>{{ $checklist->name }}
+                                <a class="c-sidebar-nav-link" style="padding: .5rem .5rem .5rem 76px;"
+                                    href="{{ route('admin.checklist_groups.checklists.edit', [$group, $checklist]) }}">
+                                    <svg class="c-sidebar-nav-icon">
+                                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-list') }}">
+                                        </use>
+                                    </svg>
+                                    {{ $checklist->name }}
                                 </a>
                             </li>
                         @endforeach
+
+                        <li class="c-sidebar-nav-item">
+                            <a class="c-sidebar-nav-link"
+                                href="{{ route('admin.checklist_groups.checklists.create', $group) }}">
+                                <svg class="c-sidebar-nav-icon">
+                                    <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-note-add') }}">
+                                    </use>
+                                </svg>
+                                {{ __('Create new checklist') }}
+                            </a>
+                        </li>
                     </ul>
                 </li>
             @endforeach
 
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="{{ route('admin.checklist_groups.create') }}">
+                    <svg class="c-sidebar-nav-icon">
+                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-library-add') }}"></use>
+                    </svg> {{ __('Create new checklist group') }}
+                </a>
+            </li>
+
             <li class="c-sidebar-nav-title">{{ __('Pages') }}</li>
 
             @foreach (\App\Models\Page::all() as $page)
-            <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="{{ route('admin.pages.edit', [$page]) }}">
-                    <svg class="c-sidebar-nav-icon">
-                        <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
-                    </svg>{{ $page->title }}
-                </a>
-            </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ route('admin.pages.edit', [$page]) }}">
+                        <svg class="c-sidebar-nav-icon">
+                            <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-puzzle') }}"></use>
+                        </svg>{{ $page->title }}
+                    </a>
+                </li>
+            @endforeach
+
+        @else
+            @foreach (\App\Models\ChecklistGroup::with('checklists')->get() as $group)
+                <li class="c-sidebar-nav-title">{{ $group->name }}</li>
+
+                @foreach ($group->checklists as $checklist)
+                    <li class="c-sidebar-nav-item">
+                        <a class="c-sidebar-nav-link"
+                            href="{{ route('user.checklists.show', [$checklist]) }}">
+                            <svg class="c-sidebar-nav-icon">
+                                <use xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-list') }}">
+                                </use>
+                            </svg>
+                            {{ $checklist->name }}
+                        </a>
+                    </li>
+                @endforeach
             @endforeach
         @endif
 
-            <li class="c-sidebar-nav-title">{{ __('Account') }}</li>
-            <li class="c-sidebar-nav-item">
+        <li class="c-sidebar-nav-title">{{ __('Account') }}</li>
+        <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('logout') }}"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <svg class="c-sidebar-nav-icon">
