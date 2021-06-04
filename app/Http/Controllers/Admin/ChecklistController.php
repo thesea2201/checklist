@@ -29,9 +29,9 @@ class ChecklistController extends Controller
      */
     public function store(StoreChecklistRequest $request, ChecklistGroup $checklistGroup)
     {
-        $checklistGroup->checklists()->create($request->validated());
+        $checklist = $checklistGroup->checklists()->create($request->validated());
 
-        return redirect()->route('home');        
+        return redirect()->route('admin.checklist_groups.checklists.edit', ['checklist_group' => $checklistGroup, 'checklist' => $checklist]);        
     }
 
     /**
