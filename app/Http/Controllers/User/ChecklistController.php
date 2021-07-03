@@ -13,7 +13,7 @@ class ChecklistController extends Controller
     public function show(Checklist $checklist)
     {
         //Sync checklist from admin
-        // (new ChecklistService())->sync_checklist($checklist, Auth::id());
+        (new ChecklistService())->sync_checklist($checklist, Auth::id());
 
         return view('user.checklist.show', compact('checklist'));
     }
