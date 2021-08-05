@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\TaskController as TaskAdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,5 +34,7 @@ Route::group(['middleware' => ['auth', 'save_last_action_timestamp']], function 
         Route::resource('checklist_groups', App\Http\Controllers\Admin\ChecklistGroupController::class);
         Route::resource('checklist_groups.checklists', App\Http\Controllers\Admin\ChecklistController::class);
         Route::resource('checklists.tasks', App\Http\Controllers\Admin\TaskController::class);
+
+        Route::post('re-order-position', [TaskAdminController::class, 'reOrderPosition'])->name('reOrderPosition');
     });
 });

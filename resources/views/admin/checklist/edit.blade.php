@@ -5,7 +5,8 @@
         <div class="fade-in">
             <div class="row justify-content-center">
                 <div class="col-md-12">
-                    <div id="trigger" class="card-header pointer" data-trigger="edit-fader">{{ __('Edit checklist') }}</div>
+                    <div id="trigger" class="card-header pointer" data-trigger="edit-fader">{{ __('Edit checklist') }}
+                    </div>
                     <div id="edit-fader" class="card fade-out">
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -53,28 +54,32 @@
                     </div>
 
                     <hr>
-
                     <div class="card">
                         <div class="card-header"><i class="fa fa-align-justify"></i> {{ __('Task list') }}</div>
                         <div class="card-body">
-                            <table class="table table-responsive-sm">
+                            <table class="table table-responsive-sm" id="tblLocations">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>{{ __('Task name') }}</th>
                                         <th>{{ __('Description') }}</th>
                                         <th>{{ __('Action') }}</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($checklist->tasks as $task)
-                                        <tr>
+                                    @foreach ($checklist->tasks->where('user_id', null)->sortBy('position') as $task)
+                                        @csrf
+                                        <tr id="id-{{ $task->id }}">
+                                            <td>
+                                                <a href="#">
+                                                    <svg class="c-icon c-icon-lg">
+                                                        <use
+                                                            xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-cursor-move') }}">
+                                                        </use>
+                                                    </svg>
+
+                                                </a>
+                                            </td>
                                             <td>{{ $task->name }}</td>
-                                            <td style="overflow: hidden;
-                                            text-overflow: ellipsis;
-                                            display: -webkit-box;
-                                            -webkit-line-clamp: 2; /* number of lines to show */
-                                            -webkit-box-orient: vertical;
-                                            max-height: 3.8em;">{!! $task->description !!}</td>
+                                            <td>{!! $task->description !!}</td>
                                             <td>
                                                 <a class="btn btn-sm btn-primary"
                                                     href="{{ route('admin.checklists.tasks.edit', [$checklist, $task]) }}">{{ __('Edit') }}</a>
@@ -90,7 +95,8 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                </tbody>
+
+                                </thead>
                             </table>
                         </div>
                     </div>
@@ -141,22 +147,53 @@
 @section('scripts')
     <script>
         ClassicEditor
-            .create(document.querySelector('#task-editor'))
+            .create(document.querySelector('#task-editor'), {
+                mediaEmbed: {
+                    previewsInData: true
+                }
+            })
             .catch(error => {
                 console.error(error);
             });
 
-            $("#trigger").click(function () {
-                let _this = $(this);
-                let fader = _this.data('trigger');
-                if(fader == '') return;
-                fader = $(`#${fader}`);
-                if (fader.hasClass("fade-out")) {
-                    fader.removeClass("fade-out").addClass("fade-in");
-                } else {
-                    fader.removeClass("fade-in").addClass("fade-out");
-                }
-            });
+        $("#trigger").click(function() {
+            let _this = $(this);
+            let fader = _this.data('trigger');
+            if (fader == '') return;
+            fader = $(`#${fader}`);
+            if (fader.hasClass("fade-out")) {
+                fader.removeClass("fade-out").addClass("fade-in");
+            } else {
+                fader.removeClass("fade-in").addClass("fade-out");
+            }
+        });
+
+        $("#tblLocations").sortable({
+            items: 'tr:not(tr:first-child)',
+            cursor: 'pointer',
+            axis: 'y',
+            dropOnEmpty: false,
+            start: function(e, ui) {
+                ui.item.addClass("selected");
+            },
+            stop: function(e, ui) {
+                ui.item.removeClass("selected");
+                var data = $(this).sortable('serialize');
+                data += "&_token={{ csrf_token() }}",
+                    console.log(data);
+                $.ajax({
+                    url: "{{ route('admin.reOrderPosition') }}",
+                    type: 'post',
+                    data: data,
+                    success: function(result) {
+
+                    },
+                    complete: function() {
+
+                    }
+                });
+            }
+        });
     </script>
 
 @endsection

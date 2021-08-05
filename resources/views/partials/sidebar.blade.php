@@ -68,6 +68,7 @@
             @endforeach
 
         @else
+            <!-- User menu -->
             @foreach ($user_menu as $group)
                 <li class="c-sidebar-nav-title">{{ $group['name'] }}
                     @if ($group['is_new'])
@@ -85,11 +86,17 @@
                                 </use>
                             </svg>
                             {{ $checklist['name'] }}
+                            @livewire('completed-tasks-counter', [
+                                'completedTasksCount' => $checklist['completedTasksCount'],
+                                'tasksCount'=> $checklist['tasksCount'],
+                                'checklistId'=> $checklist['id'],
+                            ])
                             @if ($checklist['is_new'])
                                 <span class="badge badge-info">NEW</span>
                             @elseif ($checklist['is_updated'])
                                 <span class="badge badge-info">UPD</span>
                             @endif
+
                         </a>
                     </li>
                 @endforeach

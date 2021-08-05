@@ -19,7 +19,8 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request, Checklist $checklist)
     {
-        $checklist->tasks()->create($request->validated());
+        $position = $checklist->tasks()->max('position') + 1;
+        $checklist->tasks()->create($request->validated() + ['position' => $position]);
 
         return redirect()->route('admin.checklist_groups.checklists.edit', [
             $checklist->checklist_group_id, $checklist
@@ -69,5 +70,16 @@ class TaskController extends Controller
         return redirect()->route('admin.checklist_groups.checklists.edit', [
             $checklist->checklist_group_id, $checklist
         ]);
+    }
+
+    public function reOrderPosition(Request $request)
+    {
+        $ids = $request->id;
+
+        foreach ($ids as $order => $id) {
+            $article = Task::findOrFail($id);
+            $article->position = $order;
+            $article->save();
+        }
     }
 }
