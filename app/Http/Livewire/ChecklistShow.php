@@ -65,7 +65,7 @@ class ChecklistShow extends Component
         $this->emitCompletedTask(1, $task->checklist_id);
     }
 
-    private function emitCompletedTask($plus = 1, $checklistId)
+    private function emitCompletedTask($plus = 1, $checklistId = null)
     {
         $this->emit(
             'taskCoplete',

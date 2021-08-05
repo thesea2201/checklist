@@ -3,6 +3,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="fade-in">
+            @livewire('header-totals-count', ['checklistGroupId' => $checklist->checklist_group_id])
             @livewire('checklist-show', ['checklist' => $checklist])
         </div>
     </div>
@@ -19,6 +20,5 @@
             //     $('#task-description-' + $(this).data('id')).toggleClass('d-none');
             // })
         })
-
     </script>
 @endsection
