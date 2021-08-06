@@ -10,6 +10,8 @@ class HeaderTotalsCount extends Component
     public $checklistGroupId;
     public $checklists;
 
+    protected $listeners = ['taskCoplete' => 'recaculateCompletedTasks'];
+
     public function render()
     {
         $this->checklists = Checklist::where('checklist_group_id', $this->checklistGroupId)
@@ -22,5 +24,14 @@ class HeaderTotalsCount extends Component
                                     }])
                                     ->get();
         return view('livewire.header-totals-count');
+    }
+
+    public function recaculateCompletedTasks($plus, $checklist_id)
+    {
+        foreach ($this->checklists as $key => $checklist) {
+            if($checklist->id == $checklist_id){
+                $checklist->user_tasks_count += $plus;
+            }
+        }
     }
 }

@@ -14,9 +14,9 @@
                                     <input wire:click="completeTask({{ $task->id }})" type="checkbox" name=""
                                         id="checkbox-{{ $task->id }}" @if (in_array($task->id, $completedTasks)) checked="checked" @endif>
                                 </td>
-                                <td id="{{ $task->id }}" wire:click="toggleTask({{ $task->id }})">
+                                <td id="{{ $task->id }}" wire:click="toggleTask({{ $task->id }})" class="pointer">
                                     {{ $task->name }}</td>
-                                <td wire:click="toggleTask({{ $task->id }})">
+                                <td wire:click="toggleTask({{ $task->id }})" class="pointer">
                                     <svg id="task-caret-up-{{ $task->id }}" class="c-sidebar-nav-icon d-none">
                                         <use
                                             xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-chevron-circle-up-alt                                            ') }}">
