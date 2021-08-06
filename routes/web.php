@@ -21,12 +21,12 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Auth::routes();
 
-Route::get('/checklists/{checklist}', [App\Http\Controllers\User\ChecklistController::class, 'show'])->name('user.checklists.show');
 
 Route::group(['middleware' => ['auth', 'save_last_action_timestamp']], function () {
     // Route::redirect('/', 'welcome');
     Route::get('welcome', [App\Http\Controllers\PageController::class, 'welcome'])->name('welcome');
     Route::get('consultation', [App\Http\Controllers\PageController::class, 'consultation'])->name('consultation');
+    Route::get('/checklists/{checklist}', [App\Http\Controllers\User\ChecklistController::class, 'show'])->name('user.checklists.show');
 
 
     Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'is_admin'], function () {

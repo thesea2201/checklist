@@ -15,8 +15,8 @@
                                             <strong>{{ $checklist->user_tasks_count }}/{{ $checklist->tasks_count }}</strong>
                                             <div class="progress progress-xs">
                                                 @if ($checklist->tasks_count)
-                                                    <div class="progress-bar bg-info" role="progressbar"
-                                                        style="width: 34%"
+                                                    <div class="progress-bar @if($checklist->user_tasks_count / $checklist->tasks_count ==1) bg-success @else bg-info @endif" role="progressbar"
+                                                        style="width: {{ 100 * $checklist->user_tasks_count / $checklist->tasks_count }}%"
                                                         aria-valuenow="{{ $checklist->user_tasks_count / $checklist->tasks_count }}"
                                                         aria-valuemin="0" aria-valuemax="100"></div>
                                                 @endif
