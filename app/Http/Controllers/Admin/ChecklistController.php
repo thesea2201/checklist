@@ -56,7 +56,7 @@ class ChecklistController extends Controller
     {
         $checklist->update($request->validated());
 
-        return redirect()->route('welcome');
+        return redirect()->route('admin.checklist_groups.checklists.edit', ['checklist_group' => $checklistGroup, 'checklist' => $checklist]);        
     }
 
     /**
