@@ -10,6 +10,7 @@ class ChecklistShow extends Component
     public $checklist;
     public $opened_tasks = [];
     public $completedTasks = [];
+    public ?Task $currentTask;
 
     public function mount()
     {
@@ -19,6 +20,8 @@ class ChecklistShow extends Component
             ->get()
             ->pluck('task_id')
             ->toArray();
+
+        $this->currentTask = NULL;
     }
 
     public function render()
@@ -26,41 +29,46 @@ class ChecklistShow extends Component
         return view('livewire.checklist-show');
     }
 
-    public function toggleTask($task_id)
+    public function toggleTask($taskId)
     {
-        if (isset($this->opened_tasks[$task_id])) {
-            unset($this->opened_tasks[$task_id]);
+        if (isset($this->opened_tasks[$taskId])) {
+            unset($this->opened_tasks[$taskId]);
+            $this->currentTask = NULL;
         } else {
-            $this->opened_tasks[$task_id] = $task_id;
+            $this->opened_tasks = [];
+            $this->opened_tasks[$taskId] = $taskId;
+            $this->currentTask = Task::where('task_id', $taskId)->where('user_id', auth()->id())->first();
+
+            if (!$this->currentTask) {
+                $task = Task::find($taskId);
+                $this->replicateTaskForUser($task);
+            }
         }
     }
 
-    public function completeTask($task_id)
+    public function completeTask($taskId)
     {
-        $task = Task::find($task_id);
+        $task = Task::find($taskId);
 
         if (is_null($task)) {
             return;
         }
 
-        $user_task = Task::where('task_id', $task_id)->where('user_id', auth()->id())->first();
-        if ($user_task) {
-            if ($user_task->completed_at == NULL) {
-                $user_task->update(['completed_at' => now()]);
+        $userTask = Task::where('task_id', $taskId)->where('user_id', auth()->id())->first();
+        if ($userTask) {
+            if ($userTask->completed_at == NULL) {
+                $userTask->update(['completed_at' => now()]);
                 $this->emitCompletedTask(1, $task->checklist_id);
             } else {
-                $user_task->update(['completed_at' => NULL]);
+                $userTask->update(['completed_at' => NULL]);
                 $this->emitCompletedTask(-1, $task->checklist_id);
             }
 
             return;
         }
 
-        $new_task = $task->replicate();
-        $new_task->user_id = auth()->user()->id;
-        $new_task->task_id = $task_id;
-        $new_task->completed_at = now();
-        $new_task->save();
+        $replicatedTask = $this->replicateTaskForUser($task);
+        $replicatedTask->update(['completed_at' => now()]);
 
         $this->emitCompletedTask(1, $task->checklist_id);
     }
@@ -71,6 +79,46 @@ class ChecklistShow extends Component
             'taskCoplete',
             $plus,
             $checklistId
+        );
+    }
+
+    private function replicateTaskForUser($task)
+    {
+        $newTask = $task->replicate();
+        $newTask->user_id = auth()->user()->id;
+        $newTask->task_id = $task->id;
+        $newTask->save();
+
+        return $newTask;
+    }
+
+    public function addToMyDay($taskId)
+    {
+        $userTask = Task::find($taskId);
+
+        if (is_null($userTask)) {
+            return;
+        }
+        if ($userTask) {
+            if ($userTask->added_to_my_day_at == NULL) {
+                $userTask->update(['added_to_my_day_at' => now()]);
+                $this->emitUserTasksCounterChange(1, 'myDay');
+            } else {
+                $userTask->update(['added_to_my_day_at' => NULL]);
+                $this->emitUserTasksCounterChange(-1, 'myDay');
+            }
+            $this->currentTask = $userTask;
+
+            return;
+        }
+    }
+
+    private function emitUserTasksCounterChange($plus = 1, $taskType = null)
+    {
+        $this->emit(
+            'userTasksCounterChange',
+            $plus,
+            $taskType
         );
     }
 }

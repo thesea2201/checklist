@@ -69,6 +69,18 @@
 
         @else
             <!-- User menu -->
+            @foreach ($userTasksMenu as $key => $userTaskMenu)
+            <li class="c-sidebar-nav-item">
+                <a class="c-sidebar-nav-link" href="#">
+                    <svg class="c-sidebar-nav-icon">
+                        <use xlink:href="{{ asset("vendors/@coreui/icons/svg/free.svg#{$userTaskMenu['icon']}") }}">
+                        </use>
+                    </svg>
+                    {{ $userTaskMenu['name'] }}
+                    @livewire('user-tasks-counter', ['taskType' => $key, 'userTasksCount' => $userTaskMenu['tasksCount']])
+                </a>
+            </li>
+            @endforeach
             @foreach ($user_menu as $group)
                 <li class="c-sidebar-nav-title">{{ $group['name'] }}
                     @if ($group['is_new'])
@@ -87,9 +99,9 @@
                             </svg>
                             {{ $checklist['name'] }}
                             @livewire('completed-tasks-counter', [
-                                'completedTasksCount' => $checklist['completedTasksCount'],
-                                'tasksCount'=> $checklist['tasksCount'],
-                                'checklistId'=> $checklist['id'],
+                            'completedTasksCount' => $checklist['completedTasksCount'],
+                            'tasksCount'=> $checklist['tasksCount'],
+                            'checklistId'=> $checklist['id'],
                             ])
                             @if ($checklist['is_new'])
                                 <span class="badge badge-info">NEW</span>

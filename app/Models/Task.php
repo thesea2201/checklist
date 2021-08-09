@@ -17,6 +17,7 @@ class Task extends Model
         'user_id',
         'task_id',
         'position',
-        'completed_at'
+        'completed_at',
+        'added_to_my_day_at'
     ];
 }

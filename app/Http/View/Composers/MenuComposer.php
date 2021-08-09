@@ -21,5 +21,6 @@ class MenuComposer
 
         $view->with('admin_menu', $menu['adminMenu']);
         $view->with('user_menu', $menu['userMenu']);
+        $view->with('userTasksMenu', $menu['userTasksMenu']);
     }
 }

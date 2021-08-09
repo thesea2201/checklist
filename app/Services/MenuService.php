@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Checklist;
 use App\Models\ChecklistGroup;
+use App\Models\Task;
 use Illuminate\Support\Carbon;
 
 class MenuService
@@ -17,9 +18,7 @@ class MenuService
             'checklists.tasks' => function ($query) {
                 $query->whereNull('tasks.user_id');
             },
-            'checklists.userTasks' => function ($query) {
-                $query->whereNotNull('tasks.completed_at');
-            }
+            'checklists.userCompletedTasks'
         ])->get();
 
         $groups = [];
@@ -35,14 +34,37 @@ class MenuService
                 $checklist['is_new'] = (!$group['is_new']) && Carbon::create($checklist['created_at'])->greaterThan($last_action_at);
                 $checklist['is_updated'] = (!$group['is_new'] && !$group['is_updated']) && (!$checklist['is_new']) && Carbon::create($checklist['updated_at'])->greaterThan($last_action_at);
                 $checklist['tasksCount'] = count($checklist['tasks']);
-                $checklist['completedTasksCount'] = count($checklist['user_tasks']);
+                $checklist['completedTasksCount'] = count($checklist['user_completed_tasks']);
             }
             $groups[] = $group;
         }
 
+        $userTasksMenu = [];
+        if(!auth()->user()->is_admin){
+            $userTasks = Task::where('user_id', auth()->id())->get();
+            $userTasksMenu = [
+                'myDay' => [
+                    'name' => 'My day',
+                    'icon' => 'cil-sun',
+                    'tasksCount' => $userTasks->whereNotNull('added_to_my_day_at')->count()
+                ],
+                'important' => [
+                    'name' => 'Important',
+                    'icon' => 'cil-start',
+                    'tasksCount' => 0
+                ],
+                'planed' => [
+                    'name' => 'Planed',
+                    'icon' => 'cil-calendar',
+                    'tasksCount' => 0
+                ]
+                ];
+        }
+
         return [
             'adminMenu' => $menu,
-            'userMenu' => $groups
+            'userMenu' => $groups,
+            'userTasksMenu' => $userTasksMenu
         ];
     }
 }
