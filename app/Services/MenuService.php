@@ -50,13 +50,13 @@ class MenuService
                 ],
                 'important' => [
                     'name' => 'Important',
-                    'icon' => 'cil-start',
-                    'tasksCount' => 0
+                    'icon' => 'cil-star',
+                    'tasksCount' => $userTasks->where('is_important', 1)->count()
                 ],
                 'planed' => [
                     'name' => 'Planed',
                     'icon' => 'cil-calendar',
-                    'tasksCount' => 0
+                    'tasksCount' => $userTasks->whereNotNull('due_date')->count()
                 ]
                 ];
         }

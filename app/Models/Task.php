@@ -18,6 +18,12 @@ class Task extends Model
         'task_id',
         'position',
         'completed_at',
-        'added_to_my_day_at'
+        'added_to_my_day_at',
+        'is_important',
+        'due_date'
+    ];
+
+    protected $dates = [
+        'due_date'
     ];
 }

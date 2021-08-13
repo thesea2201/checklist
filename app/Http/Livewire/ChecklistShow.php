@@ -11,6 +11,8 @@ class ChecklistShow extends Component
     public $opened_tasks = [];
     public $completedTasks = [];
     public ?Task $currentTask;
+    public $isTonggleDueDate = false;
+    public $dueDate;
 
     public function mount()
     {
@@ -120,5 +122,68 @@ class ChecklistShow extends Component
             $plus,
             $taskType
         );
+    }
+
+    public function makeAsImportant($taskId, $isAdminTask = 0)
+    {
+        $task = Task::find($taskId);
+
+        if ($isAdminTask) {
+            $userTask = Task::where('task_id', $taskId)
+                ->where('user_id', auth()->id(0))->first();
+        } else {
+            $userTask = $task;
+        }
+
+        if (is_null($task)) {
+            return;
+        }
+        if ($userTask) {
+            if ($userTask->is_important == 0) {
+                $userTask->update(['is_important' => 1]);
+                $this->emitUserTasksCounterChange(1, 'important');
+            } else {
+                $userTask->update(['is_important' => 0]);
+                $this->emitUserTasksCounterChange(-1, 'important');
+            }
+            $this->currentTask = $userTask;
+
+            return;
+        }
+
+        $replicatedTask = $this->replicateTaskForUser($task);
+        $replicatedTask->update(['is_important' => 1]);
+
+        $this->emitUserTasksCounterChange(1, 'important');
+    }
+
+    public function setDueDate($taskId, $dueDate = NULL)
+    {
+        $task = Task::find($taskId);
+
+        if (!$task) {
+            return;
+        }
+
+        $task->update(['due_date' => $dueDate]);
+
+        $this->currentTask = $task;
+        if ($dueDate == NULL) {
+            $this->isTonggleDueDate = true;
+            $this->emitUserTasksCounterChange(-1, 'planed');
+        } else{
+            $this->isTonggleDueDate = false;
+            $this->emitUserTasksCounterChange(1, 'planed');
+        }
+    }
+
+    public function toggleDueDate()
+    {
+        $this->isTonggleDueDate = !$this->isTonggleDueDate;
+    }
+
+    public function updatedDueDate($value)
+    {
+        $this->setDueDate($this->currentTask->id, $value);
     }
 }

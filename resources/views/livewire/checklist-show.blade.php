@@ -17,17 +17,14 @@
                                 <td id="{{ $task->id }}" wire:click="toggleTask({{ $task->id }})"
                                     class="pointer">
                                     {{ $task->name }}</td>
-                                <td wire:click="toggleTask({{ $task->id }})" class="pointer">
-                                    <svg id="task-caret-up-{{ $task->id }}" class="c-sidebar-nav-icon d-none">
-                                        <use
-                                            xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-chevron-circle-up-alt                                            ') }}">
-                                        </use>
-                                    </svg>
-                                    <svg id="task-caret-down-{{ $task->id }}" class="c-sidebar-nav-icon">
-                                        <use
-                                            xlink:href="{{ asset('vendors/@coreui/icons/svg/free.svg#cil-chevron-circle-down-alt                                            ') }}">
-                                        </use>
-                                    </svg>
+                                <td>
+                                    @if ($checklist->userTasks()->where('task_id', $task->id)->first()?->is_important)
+                                        <a wire:click.prevent="makeAsImportant({{ $task->id }}, 1)"
+                                            href="">&starf;</a>
+                                    @else
+                                        <a wire:click.prevent="makeAsImportant({{ $task->id }}, 1)"
+                                            href="">&star;</a>
+                                    @endif
                                 </td>
                             </tr>
                             @if (isset($opened_tasks[$task->id]))
@@ -46,23 +43,29 @@
         </div>
     </div>
 
-        <div class="col-md-4">
-    @if ($currentTask)
+    <div class="col-md-4">
+        @if ($currentTask)
             <div class="card">
                 <div class="card-header">
                     <strong>{{ $currentTask->name }}</strong>
                     <div class="float-right">
-                        <a href="">&star;</a>
+                        @if ($currentTask?->is_important)
+                            <a wire:click.prevent="makeAsImportant({{ $currentTask->id }})" href="">&starf;</a>
+                        @else
+                            <a wire:click.prevent="makeAsImportant({{ $currentTask->id }})" href="">&star;</a>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-body">
-                    @if ($currentTask->added_to_my_day_at == NULL)
-                        <a href="#" wire:click="addToMyDay({{$currentTask->id}})">&#9728; {{ 'Add to my day' }}</a>
+                    @if ($currentTask->added_to_my_day_at == null)
+                        <a href="#" wire:click="addToMyDay({{ $currentTask->id }})">&#9728;
+                            {{ 'Add to my day' }}</a>
                     @else
-                        <a href="#" wire:click="addToMyDay({{$currentTask->id}})">&#9940; {{ 'Remove from my day' }}</a>
+                        <a href="#" wire:click="addToMyDay({{ $currentTask->id }})">&#9940;
+                            {{ 'Remove from my day' }}</a>
                     @endif
                 </div>
             </div>
@@ -77,8 +80,30 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <a href="#">&#128197; {{ __('Add due date') }}</a>
+                            @if ($currentTask->due_date)
+                                &#128197; Due {{ $currentTask->due_date->format('M j,Y') }}
+                                <a href="" wire:click.prevent="setDueDate({{ $currentTask->id }})">{{ __('Remove') }}</a>
+                            @else
+                                <a href="" wire:click.prevent="toggleDueDate()">&#128197; {{ __('Add due date') }}</a>
+                            @endif
                         </div>
+                        @if ($isTonggleDueDate)
+                            <ul>
+                                <li>
+                                    <a wire:click.prevent="setDueDate({{ $currentTask->id }}, '{{ today()->toDateString() }}')" href="">{{ __('Today') }}</a>
+                                </li>
+                                <li>
+                                    <a wire:click.prevent="setDueDate({{ $currentTask->id }}, '{{ today()->addDay()->toDateString() }}')" href="">{{ __('Tomorrow') }}</a>
+                                </li>
+                                <li>
+                                    <a wire:click.prevent="setDueDate({{ $currentTask->id }}, '{{ today()->addWeek()->toDateString() }}')" href="">{{ __('Next week') }}</a>
+                                </li>
+
+                                <li>
+                                    {{ _('Or pick a date')}}
+                                    <input class="form-control" type="date" name="due_date" wire:model="dueDate" value="{{today()->format('m-d-Y')}}">
+                            </ul>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -88,7 +113,7 @@
                     <a href="">&#9997; {{ 'Add note' }}</a>
                 </div>
             </div>
-    @endif
-        </div>
+        @endif
+    </div>
 
 </div>
