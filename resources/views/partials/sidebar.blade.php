@@ -71,7 +71,7 @@
             <!-- User menu -->
             @foreach ($userTasksMenu as $key => $userTaskMenu)
             <li class="c-sidebar-nav-item">
-                <a class="c-sidebar-nav-link" href="#">
+                <a class="c-sidebar-nav-link" href="{{ route('user.checklists.taskList', ['listType' => $key]) }}">
                     <svg class="c-sidebar-nav-icon">
                         <use xlink:href="{{ asset("vendors/@coreui/icons/svg/free.svg#{$userTaskMenu['icon']}") }}">
                         </use>
