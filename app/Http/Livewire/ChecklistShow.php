@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Task;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
@@ -21,17 +22,17 @@ class ChecklistShow extends Component
     public $isTonggleNote = false;
     public $dueDate;
     public $note;
+    public $isTonggleReminder = false;
+    public $reminderDate;
+    public $reminderHour;
 
     public function mount()
     {
-        // $this->completedTasks = Task::where('checklist_id', $this->checklist->id)
-        //     ->where('user_id', auth()->user()->id)
-        //     ->whereNotNull('completed_at')
-        //     ->get()
-        //     ->pluck('task_id')
-        //     ->toArray();
-
         $this->currentTask = NULL;
+
+        $this->dueDate = now()->toDateString();
+        $this->reminderDate = now()->addDay()->toDateString();
+        $this->reminderHour = now()->hour;
     }
 
     public function render()
@@ -222,26 +223,44 @@ class ChecklistShow extends Component
         $this->isTonggleDueDate = !$this->isTonggleDueDate;
     }
 
-    public function updatedDueDate($value)
-    {
-        $this->setDueDate($this->currentTask->id, $value);
-    }
-
     public function toggleNote()
     {
         $this->isTonggleNote = !$this->isTonggleNote;
         $this->note = $this->currentTask->note;
-        Log::info($this->note);
     }
 
     public function saveNotes($taskId)
-    {        Log::info($this->note);
-
+    {
         $task = Task::find($taskId);
         if ($task) {
             $task->update(['note' => $this->note]);
             $this->currentTask = $task;
             $this->isTonggleNote = false;
+        }
+    }
+
+    public function toggleReminder()
+    {
+        $this->isTonggleReminder = !$this->isTonggleReminder;
+        // $this->reminderDate = $this->currentTask->reminder_at->toDateString();
+        // $this->reminderHour = $this->currentTask->reminder_at->toDateString();
+    }
+
+    public function setReminder($taskId, $reminderDate = null)
+    {
+        $task = Task::find($taskId);
+        if ($task) {
+            if ($reminderDate == null) {
+                $reminderAt = null;
+                $this->isTonggleReminder = true;
+            } else {
+                $reminderAt = Carbon::create($reminderDate)
+                    ->setHour($this->reminderHour ?? now()->hour);
+                $this->isTonggleReminder = false;
+            }
+
+            $task->update(['reminder_at' => $reminderAt]);
+            $this->currentTask = $task;
         }
     }
 }

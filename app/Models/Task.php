@@ -21,10 +21,17 @@ class Task extends Model
         'added_to_my_day_at',
         'is_important',
         'due_date',
-        'note'
+        'note',
+        'reminder_at'
     ];
 
     protected $dates = [
-        'due_date'
+        'due_date',
+        'reminder_at'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
