@@ -83,7 +83,8 @@ class ChecklistShow extends Component
 
             if (!$this->currentTask) {
                 $task = Task::find($taskId);
-                $this->replicateTaskForUser($task);
+                $userTask = $this->replicateTaskForUser($task);
+                $this->currentTask = $userTask;
             }
         }
     }
