@@ -6,7 +6,7 @@
             </div>
 
             <div class="card-body">
-                @if (count($userTasks))
+                @if (count($listTasks))
                     <table class="table table-responsive-sm">
                         <thead>
                             @foreach ($listTasks as $task)
