@@ -154,7 +154,7 @@
                                 </li>
 
                                 <li>
-                                    {{ _('Or pick a date') }}
+                                    {{ __('Or pick a date') }}
                                     <div class="row">
                                         <div class="col-12">
                                             <input class="form-control" type="date" wire:model="dueDate" name="due_date"
