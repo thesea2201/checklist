@@ -16,7 +16,7 @@ class UserTasksCounter extends Component
         return view('livewire.user-tasks-counter');
     }
 
-    public function recalculateTask($plus = 1, $taskType)
+    public function recalculateTask($plus = 1, $taskType = '')
     {
         if($this->taskType == $taskType){
             $this->userTasksCount += $plus;
